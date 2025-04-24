@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Pneumonia Detection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- Font Awesome for icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      scroll-behavior: smooth;
+    }
+
+    html, body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f5f5f5;
+      color: #333;
+      overflow-x: hidden;
+      scrollbar-width: none; /* Firefox */
+    }
+
+    body::-webkit-scrollbar {
+      display: none; /* Chrome */
+    }
+
+    nav {
+      background-color: #007b8f;
+      padding: 15px 0;
+      text-align: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav a {
+      color: white;
+      margin: 0 20px;
+      font-size: 18px;
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+
+    nav a:hover {
+      color: #ffeb3b;
+    }
+
+    .hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .slider {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 400%;
+      height: 100%;
+      display: flex;
+      animation: slide 20s infinite;
+    }
+
+    .slider img {
+      width: 100vw;
+      height: 100%;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+
+    @keyframes slide {
+      0%, 20% { transform: translateX(0); }
+      25%, 45% { transform: translateX(-100vw); }
+      50%, 70% { transform: translateX(-200vw); }
+      75%, 95% { transform: translateX(-300vw); }
+      100% { transform: translateX(0); }
+    }
+
+    .hero .btn {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 15px 30px;
+      background-color: #00bcd4;
+      color: white;
+      font-size: 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      z-index: 10;
+    }
+
+    .hero .btn:hover {
+      background-color: #008b8b;
+    }
+
+    .section {
+      padding: 60px 20px;
+      max-width: 1000px;
+      margin: auto;
+      background-color: #fff;
+      margin-bottom: 0;
+    }
+
+    .section h2 {
+      text-align: center;
+      color: #007b8f;
+      margin-bottom: 30px;
+    }
+
+    .info-box {
+      background-color: #e0f7fa;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      min-height: 150px;
+      text-align: center;
+      font-size: 18px;
+      animation: fade 1s ease-in-out;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .about, .contact {
+      background-color: #e0f7fa;
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .about p {
+      max-width: 800px;
+      margin: 10px auto;
+      line-height: 1.6;
+    }
+
+    .contact form {
+      margin-top: 20px;
+      max-width: 600px;
+      margin-inline: auto;
+    }
+
+    .contact input, .contact textarea {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+
+    .contact button {
+      background-color: #007b8f;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      margin-top: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .contact button:hover {
+      background-color: #004c5f;
+    }
+
+    .social-icons {
+      margin-top: 30px;
+    }
+
+    .social-icons a {
+      margin: 0 12px;
+      font-size: 26px;
+      color: #007b8f;
+      transition: color 0.3s;
+    }
+
+    .social-icons a:hover {
+      color: #004c5f;
+    }
+
+    @media (max-width: 768px) {
+      nav a {
+        display: block;
+        margin: 10px 0;
+      }
+
+      .slider {
+        flex-direction: column;
+      }
+
+      .slider img {
+        height: 100vh;
+      }
+
+      .hero .btn {
+        font-size: 18px;
+        padding: 12px 24px;
+      }
+
+      .info-box {
+        font-size: 16px;
+      }
+    }
+    .nav-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  max-width: 1200px;
+  padding: 0 20px;
+  margin: auto;
+  position: relative;
+}
+
+.logo {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.hamburger {
+  display: none;
+  font-size: 26px;
+  color: white;
+  cursor: pointer;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .hamburger {
+    display: block;
+  }
+
+  .nav-links {
+    position: absolute;
+    top: 60px;
+    left: 0;
+    right: 0;
+    background-color: #007b8f;
+    flex-direction: column;
+    align-items: center;
+    display: none;
+    gap: 15px;
+    padding: 15px 0;
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    display: flex;
+  }
+
+  nav a {
+    margin: 0;
+    font-size: 18px;
+  }
+}
+
+
+  </style>
+</head>
+
+<script>
+  function toggleMenu() {
+    const navLinks = document.getElementById('navLinks');
+    navLinks.classList.toggle('active');
+  }
+</script>
+
+<body>
+
+  <nav>
+    <div class="nav-container">
+      <div class="logo">Pneumonia AI</div>
+      <div class="hamburger" onclick="toggleMenu()">
+        <i class="fas fa-bars"></i>
+      </div>
+      <div class="nav-links" id="navLinks">
+        <a href="#home">Home</a>
+        <a href="#info">Info</a>
+        <a href="/patients">Patients</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+  
+
+  <section class="hero" id="home">
+    <div class="slider">
+      <img src="https://d2jx2rerrg6sh3.cloudfront.net/images/news/ImageForNews_740889_16781885525099655.jpg" alt="Slide 1">
+      <img src="https://d2jx2rerrg6sh3.cloudfront.net/image-handler/picture/2021/5/shutterstock_1160251117.jpg" alt="Slide 2">
+      <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTedbf0JIY9TJ0kSQ91ySlEpWlPijiQhcNcqw&s" alt="Slide 3">
+      <img src="https://media.istockphoto.com/id/1358144301/photo/female-uk-nhs-pharmacist-holding-blue-pill.jpg?s=612x612&w=0&k=20&c=DvUR-TOAzdfgT9slpua8qS3p9Auc2fG1h7mSfpAX_AM=" alt="Slide 4">
+    </div>
+    <form action="/register" method="get">
+      <button class="btn">Get Started</button>
+    </form>
+  </section>
+
+  <section class="section" id="info">
+    <h2>Info Highlights</h2>
+    <div class="info-box" id="infoBox">
+      Pneumonia is a serious infection that affects the lungs, causing inflammation in the air sacs.
+    </div>
+  </section>
+
+  <section class="about" id="about">
+    <h2>About Us</h2>
+    <p>We are a team of medical technologists and developers passionate about revolutionizing early pneumonia detection.</p>
+    <p>By integrating deep learning and artificial intelligence, our project provides accurate and fast analysis of chest X-rays to aid in life-saving diagnostics.</p>
+    <p>With a mission to reduce diagnostic time and human error, our platform empowers healthcare professionals to deliver better outcomes.</p>
+  </section>
+
+  <section class="contact" id="contact">
+    <h2>Contact Us</h2>
+    <form>
+      <input type="text" placeholder="Your Name" required><br>
+      <input type="email" placeholder="Your Email" required><br>
+      <textarea rows="4" placeholder="Your Message" required></textarea><br>
+      <button type="submit">Send Message</button>
+    </form>
+
+    <div class="social-icons">
+      <a href="mailto:contact@pneumoniaai.com" title="Gmail"><i class="fas fa-envelope"></i></a>
+      <a href="https://facebook.com/yourpage" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
+      <a href="https://instagram.com/yourpage" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+    </div>
+  </section>
+
+  <script>
+    const infoList = [
+      "Pneumonia is a serious infection that affects the lungs, causing inflammation in the air sacs.",
+      "Common treatments include antibiotics and supportive care.",
+      "Vaccines are available to prevent certain types of pneumonia.",
+      "Early detection is key to effective treatment and recovery.",
+      "Our system uses deep learning to analyze chest X-rays for signs of pneumonia.",
+      "Children and the elderly are at a higher risk of developing pneumonia.",
+      "A timely and accurate diagnosis can significantly reduce hospitalization time.",
+      "AI models trained on thousands of X-rays improve diagnosis consistency.",
+      "Symptoms often include cough, fever, chest pain, and difficulty breathing."
+    ];
+
+    let index = 0;
+    setInterval(() => {
+      index = (index + 1) % infoList.length;
+      document.getElementById('infoBox').textContent = infoList[index];
+    }, 5000);
+  </script>
+
+</body>
+</html>
