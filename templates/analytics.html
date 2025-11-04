@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analytics Dashboard - Pneumonia AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 123, 143, 0.2);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .nav-logo {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+    .nav-links a:hover {
+      color: #ffeb3b;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #ffeb3b;
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    /* Right Nav Section - Hamburger and Profile */
+    .right-nav {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+    /* Hamburger Menu */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 25px;
+      height: 20px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 1001;
+      transition: transform 0.3s ease;
+    }
+    .hamburger:hover {
+      transform: scale(1.1);
+    }
+    .hamburger span {
+      width: 100%;
+      height: 3px;
+      background: white;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+    }
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+    .profile-dropdown {
+      position: relative;
+    }
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffeb3b 0%, #ffd700 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e293b;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .profile-avatar:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+    .profile-avatar img.profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      min-width: 150px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      list-style: none;
+      padding: 10px 0;
+      z-index: 9999;
+    }
+    .dropdown-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-menu li a {
+      display: block;
+      padding: 10px 20px;
+      color: #1e293b;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    .dropdown-menu li a:hover {
+      background: #f1f5f9;
+    }
+    /* Mobile Menu Overlay */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100vh;
+      background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
+      transition: left 0.3s ease;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 2rem;
+      box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.1);
+    }
+    .mobile-menu.active {
+      left: 0;
+    }
+    .mobile-menu a {
+      color: white;
+      text-decoration: none;
+      font-size: 1.2rem;
+      font-weight: 500;
+      transition: color 0.3s ease, transform 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+    }
+    .mobile-menu a:hover {
+      color: #ffeb3b;
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, 0.1);
+    }
+    /* Main Content - Full width for PCs/Laptops */
+    .main-content {
+      width: 100%;
+      margin: 2rem 0;
+      padding: 0 20px;
+      max-width: none;
+    }
+    /* Sections - Full width coverage */
+    .section {
+      display: none;
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    .section.active {
+      display: block;
+    }
+    .section h2 {
+      color: #007b8f;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    /* Stats Cards - Centered and flexible */
+    .stats {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    .card {
+      background: linear-gradient(135deg, #007b8f, #00bcd4);
+      color: white;
+      border-radius: 10px;
+      padding: 1.5rem;
+      flex: 1;
+      text-align: center;
+      min-width: 200px;
+      max-width: 250px;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 6px 20px rgba(0, 123, 143, 0.2);
+    }
+    .card h2 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .card p {
+      opacity: 0.9;
+      font-size: 1rem;
+    }
+    /* Charts - Full width responsive */
+    .charts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      width: 100%;
+    }
+    .chart-container {
+      flex: 1;
+      min-width: 300px;
+      max-width: 500px;
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      width: 100%;
+    }
+    canvas {
+      max-width: 100%;
+      height: auto;
+    }
+    /* Patient Records Section - No horizontal scroll, proper alignment */
+    .search-box {
+      width: 100%;
+      max-width: 400px;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 16px;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      transition: border-color 0.3s ease;
+    }
+    .search-box:focus {
+      outline: none;
+      border-color: #00bcd4;
+      box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+    }
+    .records-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1rem;
+      table-layout: auto;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .records-table th,
+    .records-table td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #e2e8f0;
+      vertical-align: top;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+    }
+    .records-table th {
+      background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+      font-weight: 600;
+      color: #475569;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .records-table tr:hover {
+      background: #f8fafc;
+    }
+    .records-table td {
+      white-space: normal; /* Allow wrapping to prevent horizontal scroll */
+    }
+    .status-pneumonia {
+      color: #ef4444;
+      font-weight: bold;
+    }
+    .status-normal {
+      color: #10b981;
+      font-weight: bold;
+    }
+    .no-records {
+      text-align: center;
+      color: #64748b;
+      font-style: italic;
+      padding: 2rem;
+    }
+    /* Action Buttons - Eye button for view image */
+    .action-btn {
+      padding: 8px 12px;
+      margin: 0 4px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      transition: all 0.3s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .action-btn:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+    .btn-view {
+      background: #3b82f6;
+      color: white;
+    }
+    .btn-edit {
+      background: #f59e0b;
+      color: white;
+    }
+    .btn-delete {
+      background: #ef4444;
+      color: white;
+    }
+    /* Image Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      animation: fadeInModal 0.3s ease;
+    }
+    .modal-content {
+      background: white;
+      margin: 5% auto;
+      padding: 2rem;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      animation: slideUp 0.3s ease;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    .close-modal {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: #64748b;
+      transition: color 0.3s ease;
+      background: none;
+      border: none;
+    }
+    .close-modal:hover {
+      color: #ef4444;
+    }
+    /* Image Modal Specific */
+    #image-modal .modal-content {
+      max-width: 90%;
+      width: 90%;
+      text-align: center;
+      padding: 1rem;
+    }
+    #full-image {
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes fadeInModal {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(50px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    /* Responsive Enhancements - Mobile to Desktop */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-links {
+        display: none;
+      }
+      .mobile-menu {
+        display: flex;
+      }
+      .right-nav {
+        gap: 0.5rem;
+      }
+      .main-content {
+        padding: 0 10px;
+        margin: 1rem 0;
+      }
+      .stats {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+      .card {
+        max-width: 100%;
+        min-width: auto;
+      }
+      .charts {
+        flex-direction: column;
+        align-items: center;
+      }
+      .chart-container {
+        max-width: 100%;
+        min-width: auto;
+      }
+      .records-table {
+        font-size: 14px;
+        border: 0;
+      }
+      .records-table thead {
+        border: none;
+        clip: rect(0 0 0 0);
+        height: 1px;
+        margin: -1px;
+        overflow: hidden;
+        padding: 0;
+        position: absolute;
+        width: 1px;
+      }
+      .records-table tr {
+        border-bottom: 3px solid #ddd;
+        display: block;
+        margin-bottom: .625em;
+      }
+      .records-table td {
+        border-bottom: 1px solid #ddd;
+        display: block;
+        font-size: .8em;
+        text-align: right;
+        padding: 10px;
+        position: relative;
+        padding-left: 50%;
+      }
+      .records-table td::before {
+        content: attr(data-label);
+        position: absolute;
+        left: 6px;
+        width: 45%;
+        padding-right: 10px;
+        white-space: nowrap;
+        font-weight: bold;
+      }
+      .action-btn {
+        padding: 4px 6px;
+        font-size: 10px;
+        width: 100%;
+        margin: 2px 0;
+        justify-content: center;
+      }
+      #image-modal .modal-content {
+        width: 95%;
+        margin: 10% auto;
+        padding: 1rem;
+      }
+    }
+    /* Laptop/Desktop - Ensure full coverage */
+    @media (min-width: 769px) and (max-width: 1440px) {
+      .main-content {
+        padding: 0 40px;
+      }
+      .stats {
+        justify-content: space-evenly;
+      }
+      .charts {
+        justify-content: space-evenly;
+      }
+    }
+    @media (min-width: 1441px) {
+      .main-content {
+        padding: 0 10%;
+      }
+      .stats {
+        justify-content: space-evenly;
+      }
+      .charts {
+        justify-content: space-evenly;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">Pneumonia AI Dashboard</div>
+      <ul class="nav-links">
+        <li><a href="/dashboard"><i class="fas fa-home"></i> Home</a></li>
+        <li><a href="#" onclick="showSection('analytics-stats')"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+        <li><a href="#" onclick="showSection('patients')"><i class="fas fa-users"></i> Patient Records</a></li>
+      </ul>
+      <div class="right-nav">
+        <button class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="profile-dropdown">
+          <div class="profile-avatar" id="profile-btn">
+            {% if user.profile_pic %}
+              <img src="{{ url_for('static', filename=user.profile_pic) }}" alt="Profile" id="navbar-profile" class="profile-img">
+            {% else %}
+              {{ user.full_name[0] | upper }}{{ user.full_name.split()[-1][0] | upper if user.full_name.split()[-1] else '' }}
+            {% endif %}
+          </div>
+          <ul class="dropdown-menu" id="dropdown">
+            <li><a href="#" onclick="openSettingsModal()">Settings</a></li>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobile-menu">
+      <a href="/dashboard"><i class="fas fa-home"></i> Home</a>
+      <a href="#" onclick="showSection('analytics-stats')"><i class="fas fa-chart-bar"></i> Analytics</a>
+      <a href="#" onclick="showSection('patients')"><i class="fas fa-users"></i> Patient Records</a>
+    </div>
+  </nav>
+  <div class="main-content">
+    <!-- Analytics Stats Section -->
+    <section id="analytics-stats" class="section active">
+      <h2><i class="fas fa-chart-bar"></i> Analytics Dashboard</h2>
+      <div class="stats">
+        <div class="card">
+          <h2>{{ total_patients }}</h2>
+          <p>Total Patients</p>
+        </div>
+        <div class="card">
+          <h2>{{ pneumonia_cases }}</h2>
+          <p>Pneumonia Cases</p>
+        </div>
+        <div class="card">
+          <h2>{{ normal_cases }}</h2>
+          <p>Normal Cases</p>
+        </div>
+        <div class="card">
+          <h2>{{ avg_confidence }}%</h2>
+          <p>Average Confidence</p>
+        </div>
+      </div>
+      <div class="charts">
+        <div class="chart-container">
+          <canvas id="stateChart"></canvas>
+        </div>
+        <div class="chart-container">
+          <canvas id="caseChart"></canvas>
+        </div>
+      </div>
+    </section>
+    <!-- Patient Records Section - Removed Image column, eye button in Actions -->
+    <section id="patients" class="section">
+      <h2><i class="fas fa-users"></i> Patient Records</h2>
+      <input type="text" id="search" class="search-box" placeholder="Search by name, email, or ID...">
+      <table class="records-table" id="records-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Age</th>
+            <th>City</th>
+            <th>State</th>
+            <th>Pincode</th>
+            <th>X-ray Date</th>
+            <th>Mobile</th>
+            <th>Email</th>
+            <th>Result</th>
+            <th data-label="Actions">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="records-body">
+          {% for patient in patients %}
+          <tr>
+            <td data-label="ID">{{ patient.patient_id }}</td>
+            <td data-label="Name">{{ patient.name }}</td>
+            <td data-label="Age">{{ patient.age }}</td>
+            <td data-label="City">{{ patient.city }}</td>
+            <td data-label="State">{{ patient.state }}</td>
+            <td data-label="Pincode">{{ patient.pincode }}</td>
+            <td data-label="X-ray Date">{{ patient.xray_date }}</td>
+            <td data-label="Mobile">{{ patient.mobile }}</td>
+            <td data-label="Email">{{ patient.email }}</td>
+            <td data-label="Result" class="status-{{ 'pneumonia' if patient.result == 'Pneumonia' else 'normal' }}">{{ patient.result }}</td>
+            <td data-label="Actions">
+              <button class="action-btn btn-view" onclick="viewImage('{{ url_for('static', filename='uploads/' + patient.image_path) }}')"><i class="fas fa-eye"></i> View Image</button>
+              <button class="action-btn btn-edit" onclick="window.location.href='/edit_patient/{{ patient.id }}'">
+                <i class="fas fa-edit"></i> Edit</button>
+              <button class="action-btn btn-delete" onclick="deletePatient({{ patient.id }})"><i class="fas fa-trash"></i> Delete</button>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% if not patients %}
+        <div class="no-records">No patient records found. Upload your first patient on the dashboard!</div>
+      {% endif %}
+    </section>
+    <!-- Image View Modal -->
+    <div id="image-modal" class="modal">
+      <div class="modal-content">
+        <span class="close-modal" onclick="closeImageModal()">&times;</span>
+        <img id="full-image" src="" alt="Full X-Ray Image">
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ✅ Navbar Dropdown
+    document.addEventListener('DOMContentLoaded', () => {
+      const profileBtn = document.getElementById('profile-btn');
+      const dropdown = document.getElementById('dropdown');
+      const hamburger = document.getElementById('hamburger');
+      const mobileMenu = document.getElementById('mobile-menu');
+
+      if (profileBtn && dropdown) {
+        profileBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          dropdown.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+          if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.remove('active');
+          }
+        });
+      }
+
+      // Hamburger Menu Toggle
+      if (hamburger && mobileMenu) {
+        hamburger.addEventListener('click', () => {
+          hamburger.classList.toggle('active');
+          mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+          link.addEventListener('click', () => {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+          });
+        });
+
+        // Close on outside click
+        document.addEventListener('click', (e) => {
+          if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+            hamburger.classList.remove('active');
+            mobileMenu.classList.remove('active');
+          }
+        });
+      }
+
+      // ✅ State distribution chart
+      const states = {{ states | tojson }};
+      const counts = {{ counts | tojson }};
+      const ctx1 = document.getElementById('stateChart');
+      if (ctx1) {
+        new Chart(ctx1.getContext('2d'), {
+          type: 'bar',
+          data: {
+            labels: states,
+            datasets: [{
+              label: 'Patients per State',
+              data: counts,
+              backgroundColor: '#00bcd4',
+              borderColor: '#007b8f',
+              borderWidth: 1
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { display: true, position: 'top' },
+              title: { display: true, text: 'Patient Distribution by State' }
+            },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+      }
+
+      // ✅ Pneumonia vs Normal pie chart
+      const ctx2 = document.getElementById('caseChart');
+      if (ctx2) {
+        new Chart(ctx2.getContext('2d'), {
+          type: 'pie',
+          data: {
+            labels: ['Pneumonia', 'Normal'],
+            datasets: [{
+              data: [{{ pneumonia_cases }}, {{ normal_cases }}],
+              backgroundColor: ['#ff5252', '#4caf50'],
+              borderColor: '#fff',
+              borderWidth: 2
+            }]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'right' },
+              title: { display: true, text: 'Pneumonia vs Normal Cases' }
+            }
+          }
+        });
+      }
+
+      // Search Filter (Similar to Dashboard)
+      const searchInput = document.getElementById('search');
+      if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+          const query = e.target.value.toLowerCase();
+          const rows = document.querySelectorAll('#records-body tr');
+          rows.forEach(row => {
+            const text = row.textContent.toLowerCase();
+            row.style.display = text.includes(query) ? '' : 'none';
+          });
+        });
+      }
+    });
+
+    // Section Switching (Similar to Dashboard)
+    function showSection(sectionId) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(sectionId).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Image Modal Functions (Similar to Dashboard)
+    function viewImage(imagePath) {
+      const img = document.getElementById('full-image');
+      img.src = imagePath;
+      document.getElementById('image-modal').style.display = 'block';
+    }
+
+    function closeImageModal() {
+      document.getElementById('image-modal').style.display = 'none';
+    }
+
+    // Close modal on outside click
+    document.addEventListener('click', function(e) {
+      const imageModal = document.getElementById('image-modal');
+      if (e.target === imageModal) closeImageModal();
+    });
+
+    // DELETE Patient (Similar to Dashboard)
+    async function deletePatient(patientId) {
+      if (!confirm('Are you sure you want to delete this patient?')) return;
+      try {
+        const res = await fetch(`/delete_patient/${patientId}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.success) {
+          alert('🗑️ Patient deleted successfully!');
+          location.reload();
+        } else {
+          alert(`❌ Error: ${result.error}`);
+        }
+      } catch (err) {
+        alert(`⚠️ ${err.message}`);
+      }
+    }
+
+    // Placeholder for Settings Modal (if needed, expand as in dashboard)
+    function openSettingsModal() {
+      alert('Settings modal would open here (implement as needed).');
+    }
+  </script>
+</body>
+</html>

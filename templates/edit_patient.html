@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Patient - Pneumonia AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    /* Navbar */
+    .navbar {
+      background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
+      padding: 1rem 0;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 123, 143, 0.2);
+    }
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+    .nav-logo {
+      color: white;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+    .nav-links a:hover {
+      color: #ffeb3b;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: #ffeb3b;
+      transition: width 0.3s ease;
+    }
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+    .profile-dropdown {
+      position: relative;
+    }
+    .profile-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffeb3b 0%, #ffd700 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #1e293b;
+      font-weight: bold;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    .profile-avatar:hover {
+      transform: scale(1.1);
+    }
+    .profile-avatar img.profile-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: white;
+      min-width: 150px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+      list-style: none;
+      padding: 10px 0;
+      z-index: 9999;
+    }
+    .dropdown-menu.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    .dropdown-menu li a {
+      display: block;
+      padding: 10px 20px;
+      color: #1e293b;
+      text-decoration: none;
+      transition: background 0.3s ease;
+    }
+    .dropdown-menu li a:hover {
+      background: #f1f5f9;
+    }
+    /* Main Content */
+    .main-content {
+      max-width: 1200px;
+      margin: 2rem auto;
+      padding: 0 20px;
+    }
+    /* Edit Patient Form */
+    .edit-form {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 15px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    }
+    .edit-form h2 {
+      color: #007b8f;
+      margin-bottom: 1.5rem;
+      font-size: 1.8rem;
+      text-align: center;
+    }
+    .form-group {
+      margin-bottom: 1.5rem;
+      text-align: left;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #475569;
+    }
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+    .form-group input:focus,
+    .form-group select:focus {
+      outline: none;
+      border-color: #00bcd4;
+    }
+    .update-btn {
+      background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: transform 0.3s ease;
+      display: block;
+      margin: 1rem auto;
+    }
+    .update-btn:hover {
+      transform: translateY(-2px);
+    }
+    .update-btn:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+    .xray-preview {
+      max-width: 300px;
+      max-height: 300px;
+      border-radius: 8px;
+      margin: 1rem auto;
+      display: block;
+    }
+    .result-message {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      display: none;
+    }
+    .result-message.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .result-message.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+    @media (max-width: 768px) {
+      .edit-form {
+        padding: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <div class="nav-logo">Pneumonia AI Dashboard</div>
+      <ul class="nav-links">
+        <li><a href="/dashboard">Dashboard</a></li>
+        <li><a href="#" onclick="showSection('analytics')">Analytics</a></li>
+        <li><a href="#" onclick="showSection('patients')">Patient Records</a></li>
+        <div class="profile-dropdown">
+          <div class="profile-avatar" id="profile-btn">
+            {% if user.profile_pic %}
+              <img src="{{ url_for('static', filename=user.profile_pic) }}" alt="Profile" id="navbar-profile" class="profile-img">
+            {% else %}
+              {{ user.full_name[0] | upper }}{{ user.full_name.split()[-1][0] | upper if user.full_name.split()[-1] else '' }}
+            {% endif %}
+          </div>
+          <ul class="dropdown-menu" id="dropdown">
+            <li><a href="#" onclick="openSettingsModal()">Settings</a></li>
+            <li><a href="/logout">Logout</a></li>
+          </ul>
+        </div>
+      </ul>
+    </div>
+  </nav>
+  <div class="main-content">
+    <div class="edit-form">
+      <h2><i class="fas fa-edit"></i> Edit Patient</h2>
+      <form id="editPatientForm" enctype="multipart/form-data">
+        <input type="hidden" id="patientId" name="patientId" value="{{ patient.id }}">
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" name="name" value="{{ patient.name }}" required>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" name="age" value="{{ patient.age }}" min="1" max="120" required>
+        </div>
+        <div class="form-group">
+          <label for="city">City</label>
+          <input type="text" id="city" name="city" value="{{ patient.city }}" required>
+        </div>
+        <div class="form-group">
+          <label for="state">State</label>
+          <input type="text" id="state" name="state" value="{{ patient.state }}" required>
+        </div>
+        <div class="form-group">
+          <label for="pincode">Pincode</label>
+          <input type="text" id="pincode" name="pincode" value="{{ patient.pincode }}" required>
+        </div>
+        <div class="form-group">
+          <label for="xray_date">X-ray Date</label>
+          <input type="date" id="xray_date" name="xray_date" value="{{ patient.xray_date }}" required>
+        </div>
+        <div class="form-group">
+          <label for="mobile">Mobile</label>
+          <input type="tel" id="mobile" name="mobile" value="{{ patient.mobile }}" required>
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" value="{{ patient.email }}" required>
+        </div>
+        <div class="form-group">
+          <label for="image">X-Ray Image</label>
+          <input type="file" id="image" name="image" accept="image/*">
+          <img id="preview" class="xray-preview" src="{{ url_for('static', filename='uploads/' + patient.image_path) }}" alt="Current X-ray">
+        </div>
+        <button type="submit" class="update-btn">Update Patient</button>
+      </form>
+      <div id="result-message" class="result-message"></div>
+    </div>
+  </div>
+  <script>
+    // Navbar Dropdown
+    document.addEventListener('DOMContentLoaded', () => {
+      const profileBtn = document.getElementById('profile-btn');
+      const dropdown = document.getElementById('dropdown');
+      profileBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('active');
+      });
+      document.addEventListener('click', (e) => {
+        if (!profileBtn.contains(e.target) && !dropdown.contains(e.target)) {
+          dropdown.classList.remove('active');
+        }
+      });
+    });
+
+    // Image Preview for Upload
+    document.getElementById('image').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          document.getElementById('preview').src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    // Update Patient (AJAX)
+    document.getElementById('editPatientForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const formData = new FormData(this);
+      const resultDiv = document.getElementById('result-message');
+      const submitBtn = this.querySelector('.update-btn');
+      submitBtn.textContent = 'Updating...';
+      submitBtn.disabled = true;
+      resultDiv.style.display = 'none';
+      fetch('/update_patient', { method: 'POST', body: formData })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            resultDiv.innerHTML = `
+              <h4><i class="fas fa-check-circle"></i> Success</h4>
+              <p>Patient updated successfully!</p>
+            `;
+            resultDiv.className = 'result-message success';
+            resultDiv.style.display = 'block';
+            setTimeout(() => window.location.href = '/dashboard', 2000);
+          } else {
+            resultDiv.innerHTML = `<p>Error: ${data.error}</p>`;
+            resultDiv.className = 'result-message error';
+            resultDiv.style.display = 'block';
+          }
+        })
+        .catch(error => {
+          resultDiv.innerHTML = `<p>Error: ${error.message}</p>`;
+          resultDiv.className = 'result-message error';
+          resultDiv.style.display = 'block';
+        })
+        .finally(() => {
+          submitBtn.textContent = 'Update Patient';
+          submitBtn.disabled = false;
+        });
+    });
+  </script>
+</body>
+</html>

@@ -16,8 +16,8 @@
 
     html, body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #f5f5f5;
-      color: #333;
+      background-color: #f8fafc;
+      color: #1e293b;
       overflow-x: hidden;
       scrollbar-width: none; /* Firefox */
     }
@@ -27,24 +27,134 @@
     }
 
     nav {
-      background-color: #007b8f;
+      background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
       padding: 15px 0;
       text-align: center;
       position: sticky;
       top: 0;
       z-index: 1000;
+      box-shadow: 0 2px 10px rgba(0, 123, 143, 0.2);
     }
 
-    nav a {
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      padding: 0 20px;
+      margin: auto;
+      position: relative;
+    }
+
+    .logo {
       color: white;
-      margin: 0 20px;
-      font-size: 18px;
-      text-decoration: none;
-      transition: color 0.3s;
+      font-size: 24px;
+      font-weight: bold;
     }
 
-    nav a:hover {
-      color: #ffeb3b;
+    .hamburger {
+      display: none;
+      font-size: 26px;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .hamburger:hover {
+      transform: rotate(90deg);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .nav-links a {
+      color: white;
+      font-size: 16px;
+      text-decoration: none;
+      padding: 8px 16px;
+      border-radius: 20px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-links a::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transition: left 0.5s;
+    }
+
+    .nav-links a:hover::before {
+      left: 100%;
+    }
+
+    .nav-links a:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .auth-buttons {
+      display: flex;
+      gap: 10px;
+    }
+
+    .auth-buttons a {
+      padding: 8px 20px !important;
+      font-size: 14px !important;
+    }
+
+    .auth-buttons .register {
+      background-color: #ffeb3b;
+      color: #1e293b !important;
+    }
+
+    .auth-buttons .login {
+      background-color: transparent;
+      border: 1px solid white;
+    }
+
+    @media (max-width: 768px) {
+      .hamburger {
+        display: block;
+      }
+
+      .nav-links {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
+        flex-direction: column;
+        align-items: center;
+        display: none;
+        gap: 15px;
+        padding: 20px 0;
+        z-index: 1000;
+      }
+
+      .nav-links.active {
+        display: flex;
+      }
+
+      .auth-buttons {
+        flex-direction: column;
+        width: 100%;
+        gap: 10px;
+      }
+
+      .nav-links a {
+        margin: 0;
+        width: 80%;
+        text-align: center;
+      }
     }
 
     .hero {
@@ -54,6 +164,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      background: linear-gradient(rgba(0, 123, 143, 0.5), rgba(0, 188, 212, 0.5));
     }
 
     .slider {
@@ -63,7 +174,7 @@
       width: 400%;
       height: 100%;
       display: flex;
-      animation: slide 20s infinite;
+      animation: slide 30s infinite ease-in-out;
     }
 
     .slider img {
@@ -71,76 +182,246 @@
       height: 100%;
       object-fit: cover;
       flex-shrink: 0;
+      filter: grayscale(20%) brightness(0.8);
+      transition: filter 0.3s ease;
+    }
+
+    .slider img:hover {
+      filter: grayscale(0%) brightness(1);
     }
 
     @keyframes slide {
-      0%, 20% { transform: translateX(0); }
-      25%, 45% { transform: translateX(-100vw); }
-      50%, 70% { transform: translateX(-200vw); }
-      75%, 95% { transform: translateX(-300vw); }
-      100% { transform: translateX(0); }
+      0%, 25% { transform: translateX(0); }
+      25.1%, 50% { transform: translateX(-100vw); }
+      50.1%, 75% { transform: translateX(-200vw); }
+      75.1%, 100% { transform: translateX(-300vw); }
+    }
+
+    .hero-content {
+      text-align: center;
+      z-index: 10;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .hero h1 {
+      font-size: 3.5rem;
+      color: white;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .hero p {
+      font-size: 1.5rem;
+      color: white;
+      margin-bottom: 30px;
+      opacity: 0.9;
     }
 
     .hero .btn {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      padding: 15px 30px;
-      background-color: #00bcd4;
+      padding: 15px 40px;
+      background: linear-gradient(135deg, #00bcd4 0%, #007b8f 100%);
       color: white;
       font-size: 20px;
       border: none;
-      border-radius: 8px;
+      border-radius: 50px;
       cursor: pointer;
-      transition: background-color 0.3s;
-      z-index: 10;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 188, 212, 0.3);
+      animation: pulse 2s infinite;
     }
 
     .hero .btn:hover {
-      background-color: #008b8b;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(0, 188, 212, 0.4);
+      background: linear-gradient(135deg, #008b8b 0%, #005f73 100%);
+    }
+
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(0, 188, 212, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 188, 212, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 188, 212, 0); }
     }
 
     .section {
-      padding: 60px 20px;
-      max-width: 1000px;
+      padding: 80px 20px;
+      max-width: 1200px;
       margin: auto;
-      background-color: #fff;
-      margin-bottom: 0;
     }
 
     .section h2 {
       text-align: center;
       color: #007b8f;
-      margin-bottom: 30px;
+      margin-bottom: 50px;
+      font-size: 2.5rem;
+      position: relative;
     }
 
-    .info-box {
-      background-color: #e0f7fa;
+    .section h2::after {
+      content: '';
+      display: block;
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(135deg, #00bcd4 0%, #007b8f 100%);
+      margin: 10px auto;
+      border-radius: 2px;
+    }
+
+    .cards-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: white;
       padding: 30px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      min-height: 150px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 123, 143, 0.1);
       text-align: center;
-      font-size: 18px;
-      animation: fade 1s ease-in-out;
+      transition: all 0.4s ease;
+      opacity: 0;
+      transform: translateY(50px);
+      animation: slideInUp 0.6s ease forwards;
     }
 
-    @keyframes fade {
-      from { opacity: 0; }
-      to { opacity: 1; }
+    .card:nth-child(2) { animation-delay: 0.2s; }
+    .card:nth-child(3) { animation-delay: 0.4s; }
+    .card:nth-child(4) { animation-delay: 0.6s; }
+
+    @keyframes slideInUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    .about, .contact {
-      background-color: #e0f7fa;
+    .card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(0, 123, 143, 0.2);
+    }
+
+    .card i {
+      font-size: 3rem;
+      color: #00bcd4;
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      color: #007b8f;
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .card p {
+      line-height: 1.6;
+      color: #64748b;
+    }
+
+    .about, .faqs, .help {
+      background: linear-gradient(135deg, #e0f7fa 0%, #f0f9ff 100%);
       text-align: center;
-      padding: 60px 20px;
+      padding: 80px 20px;
     }
 
     .about p {
       max-width: 800px;
-      margin: 10px auto;
+      margin: 20px auto;
       line-height: 1.6;
+      font-size: 1.1rem;
+      color: #475569;
+    }
+
+    .faq-item {
+      background: white;
+      margin-bottom: 20px;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      max-width: 800px;
+      margin: 0 auto 20px;
+      transition: all 0.3s ease;
+    }
+
+    .faq-item:hover {
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    .faq-question {
+      padding: 20px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #00bcd4 0%, #007b8f 100%);
+      color: white;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+    }
+
+    .faq-answer {
+      padding: 0 20px;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      background: white;
+    }
+
+    .faq-answer.active {
+      max-height: 200px;
+      padding: 20px;
+    }
+
+    .faq-answer p {
+      line-height: 1.6;
+      color: #64748b;
+    }
+
+    .help-links {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .help-link {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      text-decoration: none;
+      color: #1e293b;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+      text-align: center;
+    }
+
+    .help-link:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      color: #007b8f;
+    }
+
+    .help-link i {
+      font-size: 2rem;
+      color: #00bcd4;
+      margin-bottom: 10px;
+    }
+
+    .contact {
+      background: linear-gradient(135deg, #e0f7fa 0%, #f0f9ff 100%);
+      text-align: center;
+      padding: 80px 20px;
     }
 
     .contact form {
@@ -151,134 +432,83 @@
 
     .contact input, .contact textarea {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      border: 1px solid #ccc;
-      border-radius: 6px;
+      padding: 15px;
+      margin-top: 15px;
+      border: 2px solid #e2e8f0;
+      border-radius: 10px;
       font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+
+    .contact input:focus, .contact textarea:focus {
+      outline: none;
+      border-color: #00bcd4;
     }
 
     .contact button {
-      background-color: #007b8f;
+      background: linear-gradient(135deg, #007b8f 0%, #00bcd4 100%);
       color: white;
       border: none;
-      padding: 12px 20px;
-      margin-top: 10px;
-      border-radius: 5px;
+      padding: 15px 30px;
+      margin-top: 20px;
+      border-radius: 50px;
       cursor: pointer;
       font-size: 16px;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0, 123, 143, 0.2);
     }
 
     .contact button:hover {
-      background-color: #004c5f;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 123, 143, 0.3);
     }
 
     .social-icons {
-      margin-top: 30px;
+      margin-top: 40px;
     }
 
     .social-icons a {
-      margin: 0 12px;
-      font-size: 26px;
+      margin: 0 15px;
+      font-size: 28px;
       color: #007b8f;
-      transition: color 0.3s;
+      transition: all 0.3s ease;
     }
 
     .social-icons a:hover {
-      color: #004c5f;
+      color: #00bcd4;
+      transform: translateY(-3px) scale(1.1);
     }
 
     @media (max-width: 768px) {
-      nav a {
-        display: block;
-        margin: 10px 0;
+      .hero h1 {
+        font-size: 2.5rem;
       }
 
-      .slider {
-        flex-direction: column;
-      }
-
-      .slider img {
-        height: 100vh;
+      .hero p {
+        font-size: 1.2rem;
       }
 
       .hero .btn {
+        padding: 12px 30px;
         font-size: 18px;
-        padding: 12px 24px;
       }
 
-      .info-box {
+      .cards-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+
+      .section h2 {
+        font-size: 2rem;
+      }
+
+      .faq-question {
+        padding: 15px;
         font-size: 16px;
       }
     }
-    .nav-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  max-width: 1200px;
-  padding: 0 20px;
-  margin: auto;
-  position: relative;
-}
-
-.logo {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-}
-
-.hamburger {
-  display: none;
-  font-size: 26px;
-  color: white;
-  cursor: pointer;
-}
-
-.nav-links {
-  display: flex;
-  gap: 20px;
-}
-
-@media (max-width: 768px) {
-  .hamburger {
-    display: block;
-  }
-
-  .nav-links {
-    position: absolute;
-    top: 60px;
-    left: 0;
-    right: 0;
-    background-color: #007b8f;
-    flex-direction: column;
-    align-items: center;
-    display: none;
-    gap: 15px;
-    padding: 15px 0;
-    z-index: 1000;
-  }
-
-  .nav-links.active {
-    display: flex;
-  }
-
-  nav a {
-    margin: 0;
-    font-size: 18px;
-  }
-}
-
-
   </style>
 </head>
-
-<script>
-  function toggleMenu() {
-    const navLinks = document.getElementById('navLinks');
-    navLinks.classList.toggle('active');
-  }
-</script>
-
 <body>
 
   <nav>
@@ -289,14 +519,17 @@
       </div>
       <div class="nav-links" id="navLinks">
         <a href="#home">Home</a>
-        <a href="#info">Info</a>
-        <a href="/patients">Patients</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact</a>
+        <a href="#about">About Us</a>
+        <a href="#how-it-works">How it Works</a>
+        <a href="#faqs">FAQs</a>
+        <a href="#help">Help Center</a>
+        <div class="auth-buttons">
+          <a href="/register" class="register">Register</a>
+          <a href="/login" class="login">Login</a>
+        </div>
       </div>
     </div>
   </nav>
-  
 
   <section class="hero" id="home">
     <div class="slider">
@@ -305,15 +538,36 @@
       <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTedbf0JIY9TJ0kSQ91ySlEpWlPijiQhcNcqw&s" alt="Slide 3">
       <img src="https://media.istockphoto.com/id/1358144301/photo/female-uk-nhs-pharmacist-holding-blue-pill.jpg?s=612x612&w=0&k=20&c=DvUR-TOAzdfgT9slpua8qS3p9Auc2fG1h7mSfpAX_AM=" alt="Slide 4">
     </div>
-    <form action="/register" method="get">
-      <button class="btn">Get Started</button>
-    </form>
+    <div class="hero-content">
+      <h1>Revolutionize Pneumonia Detection</h1>
+      <p>Empowering healthcare with AI-driven early diagnosis from chest X-rays.</p>
+      <a href="/register"><button class="btn">Get Started</button></a>
+    </div>
   </section>
 
-  <section class="section" id="info">
-    <h2>Info Highlights</h2>
-    <div class="info-box" id="infoBox">
-      Pneumonia is a serious infection that affects the lungs, causing inflammation in the air sacs.
+  <section class="section" id="how-it-works">
+    <h2>How It Works</h2>
+    <div class="cards-container">
+      <div class="card">
+        <i class="fas fa-upload"></i>
+        <h3>Upload X-Ray</h3>
+        <p>Securely upload your chest X-ray image to our platform for instant analysis.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-brain"></i>
+        <h3>AI Analysis</h3>
+        <p>Our deep learning model, trained on thousands of images, detects pneumonia signs with high accuracy.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-chart-line"></i>
+        <h3>Get Results</h3>
+        <p>Receive detailed reports and recommendations in seconds to guide your treatment decisions.</p>
+      </div>
+      <div class="card">
+        <i class="fas fa-shield-alt"></i>
+        <h3>Secure & Compliant</h3>
+        <p>All data is encrypted and compliant with HIPAA standards for your peace of mind.</p>
+      </div>
     </div>
   </section>
 
@@ -324,40 +578,131 @@
     <p>With a mission to reduce diagnostic time and human error, our platform empowers healthcare professionals to deliver better outcomes.</p>
   </section>
 
+  <section class="section" id="faqs">
+    <h2>Frequently Asked Questions</h2>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>What is Pneumonia AI?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>Pneumonia AI is an advanced tool using machine learning to detect pneumonia from chest X-rays quickly and accurately.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>How accurate is the detection?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>Our model achieves over 95% accuracy, trained on diverse datasets from global medical sources.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>Is my data private?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>Yes, all uploads are encrypted and processed without storing personal information.</p>
+      </div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-question" onclick="toggleFAQ(this)">
+        <span>Who can use this tool?</span>
+        <i class="fas fa-chevron-down"></i>
+      </div>
+      <div class="faq-answer">
+        <p>Healthcare professionals, clinics, and patients under medical supervision.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="help" id="help">
+    <h2>Help Center</h2>
+    <p style="max-width: 800px; margin: 0 auto 40px; color: #64748b;">Find quick answers or contact support for assistance.</p>
+    <div class="help-links">
+      <a href="#contact" class="help-link">
+        <i class="fas fa-envelope"></i>
+        <h3>Contact Support</h3>
+        <p>Get personalized help from our team.</p>
+      </a>
+      <a href="/docs" class="help-link">
+        <i class="fas fa-book"></i>
+        <h3>User Guide</h3>
+        <p>Step-by-step instructions for using the platform.</p>
+      </a>
+      <a href="/tutorials" class="help-link">
+        <i class="fas fa-video"></i>
+        <h3>Tutorials</h3>
+        <p>Video guides to get started quickly.</p>
+      </a>
+      <a href="#faqs" class="help-link">
+        <i class="fas fa-question-circle"></i>
+        <h3>FAQs</h3>
+        <p>Common questions and answers.</p>
+      </a>
+    </div>
+  </section>
+
   <section class="contact" id="contact">
     <h2>Contact Us</h2>
     <form>
       <input type="text" placeholder="Your Name" required><br>
       <input type="email" placeholder="Your Email" required><br>
-      <textarea rows="4" placeholder="Your Message" required></textarea><br>
+      <textarea rows="5" placeholder="Your Message" required></textarea><br>
       <button type="submit">Send Message</button>
     </form>
 
     <div class="social-icons">
-      <a href="mailto:contact@pneumoniaai.com" title="Gmail"><i class="fas fa-envelope"></i></a>
+      <a href="mailto:contact@pneumoniaai.com" title="Email"><i class="fas fa-envelope"></i></a>
       <a href="https://facebook.com/yourpage" target="_blank" title="Facebook"><i class="fab fa-facebook"></i></a>
       <a href="https://instagram.com/yourpage" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
     </div>
   </section>
 
   <script>
-    const infoList = [
-      "Pneumonia is a serious infection that affects the lungs, causing inflammation in the air sacs.",
-      "Common treatments include antibiotics and supportive care.",
-      "Vaccines are available to prevent certain types of pneumonia.",
-      "Early detection is key to effective treatment and recovery.",
-      "Our system uses deep learning to analyze chest X-rays for signs of pneumonia.",
-      "Children and the elderly are at a higher risk of developing pneumonia.",
-      "A timely and accurate diagnosis can significantly reduce hospitalization time.",
-      "AI models trained on thousands of X-rays improve diagnosis consistency.",
-      "Symptoms often include cough, fever, chest pain, and difficulty breathing."
-    ];
+    function toggleMenu() {
+      const navLinks = document.getElementById('navLinks');
+      navLinks.classList.toggle('active');
+    }
 
-    let index = 0;
-    setInterval(() => {
-      index = (index + 1) % infoList.length;
-      document.getElementById('infoBox').textContent = infoList[index];
-    }, 5000);
+    function toggleFAQ(element) {
+      const answer = element.nextElementSibling;
+      const icon = element.querySelector('i');
+      answer.classList.toggle('active');
+      icon.style.transform = answer.classList.contains('active') ? 'rotate(180deg)' : 'rotate(0deg)';
+      icon.style.transition = 'transform 0.3s ease';
+    }
+
+    // Smooth scroll for nav links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        document.querySelector(this.getAttribute('href')).scrollIntoView({
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.style.animationPlayState = 'running';
+        }
+      });
+    }, observerOptions);
+
+    document.querySelectorAll('.card, .faq-item, .help-link').forEach(el => {
+      el.style.animationPlayState = 'paused';
+      observer.observe(el);
+    });
   </script>
 
 </body>
