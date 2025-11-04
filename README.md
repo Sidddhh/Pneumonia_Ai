@@ -1,6 +1,5 @@
 
-
-🧠 Pneumonia AI Detection
+## 🧠 **Pneumonia AI Detection**
 
 An advanced **AI-based Pneumonia Detection System** that leverages deep learning to classify chest X-ray images as **Normal**, **Bacterial Pneumonia**, or **Viral Pneumonia**.
 This enhanced version integrates **Capteche verification**, **email notifications**, **user profile management**, and **data analytics dashboards** — providing a complete, interactive medical support platform.
