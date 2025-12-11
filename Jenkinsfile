@@ -41,7 +41,7 @@ pipeline {
               echo "Container id: $cid"
               # Wait for app to be up (poll up to ~30s)
               attempts=0
-              until curl --silent --fail http://localhost:5000/ || [ $attempts -ge 15 ]; do
+              until curl --silent --fail http://localhost:5000/health || [ $attempts -ge 15 ]; do
                 sleep 2
                 attempts=$((attempts+1))
                 echo "Waiting for app to start... $attempts"
