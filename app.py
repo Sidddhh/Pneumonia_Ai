@@ -26,9 +26,26 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 # Load Model
-model_path = "model/best_vgg_model.keras"
-model = load_model(model_path)
-print("✅ Model loaded successfully!")
+#model_path = "model/best_vgg_model.keras"
+#model = load_model(model_path)
+#print("✅ Model loaded successfully!")
+# lazy-load model (do NOT load at import time)
+model = None
+
+def get_model():
+    """Load the model on first use and cache it."""
+    global model
+    if model is None:
+        print("📌 Loading model into memory...")
+        model = load_model(model_path)
+        print("✅ Model loaded (lazy).")
+    return model
+
+# lightweight health endpoint for smoke tests
+@app.route('/health')
+def health():
+    return 'OK', 200
+
 
 # DB Models
 class User(db.Model):
@@ -253,7 +270,7 @@ def upload_patient():
         img_array = image.img_to_array(img) / 255.0
         img_array = np.expand_dims(img_array, axis=0)
 
-        prediction = model.predict(img_array, verbose=0)[0][0]
+        prediction = get_model().predict(img_array, verbose=0)[0][0]
         result = "Pneumonia" if prediction > 0.5 else "Normal"
         confidence = (prediction if result == "Pneumonia" else 1 - prediction) * 100
         confidence = round(float(confidence), 2)
