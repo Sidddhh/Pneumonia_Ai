@@ -1,93 +1,96 @@
 pipeline {
-  agent any
+    agent any
 
-  environment {
-    IMAGE_NAME = "pneumonia_ai"
-    IMAGE_TAG  = "${env.BUILD_NUMBER}"
-    FULL_NAME_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
-  }
-
-  options {
-    timestamps()
-    skipStagesAfterUnstable()
-  }
-
-  stages {
-    stage('Checkout') {
-      steps {
-        checkout scm
-      }
+    environment {
+        IMAGE_NAME = "pneumonia_ai"
+        IMAGE_TAG  = "${env.BUILD_NUMBER}"
+        FULL_NAME_IMAGE = "${IMAGE_NAME}:${IMAGE_TAG}"
     }
 
-    stage('Build Docker image') {
-      steps {
-        script {
-          sh """
-            echo 'Building Docker image: ${FULL_NAME_IMAGE}'
-            docker build -t ${FULL_NAME_IMAGE} .
-          """
+    options {
+        timestamps()
+        skipStagesAfterUnstable()
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
+
+        stage('Build Docker Image') {
+            steps {
+                bat """
+                echo Building Docker image: %FULL_NAME_IMAGE%
+                docker build -t %FULL_NAME_IMAGE% .
+                """
+            }
+        }
+
+        stage('Run container & smoke test') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'gmail-creds',
+                                                  usernameVariable: 'GMAIL_USER',
+                                                  passwordVariable: 'GMAIL_PASS')]) {
+
+                    bat """
+                    echo Starting container...
+                    docker run -d -p 5000:5000 --name pneumonia_test ^
+                      -e GMAIL_USER="%GMAIL_USER%" ^
+                      -e GMAIL_PASSWORD="%GMAIL_PASS%" ^
+                      %FULL_NAME_IMAGE%
+
+                    echo Checking health endpoint...
+
+                    powershell -Command ^
+                      "for (\$i=0; \$i -lt 20; \$i++) { ^
+                          try { ^
+                              Invoke-WebRequest -Uri 'http://localhost:5000/health' -UseBasicParsing -TimeoutSec 5; ^
+                              Write-Host 'Health OK'; exit 0; ^
+                          } catch { ^
+                              Start-Sleep -Seconds 2 ^
+                          } ^
+                      }; exit 1"
+
+                    docker logs pneumonia_test
+                    docker stop pneumonia_test
+                    docker rm pneumonia_test
+                    """
+                }
+            }
+        }
+
+        stage('Push to Docker Hub (optional)') {
+            when {
+                expression { return true }
+            }
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerhub-creds',
+                                                  usernameVariable: 'DH_USER',
+                                                  passwordVariable: 'DH_PASS')]) {
+
+                    bat """
+                    echo Logging into DockerHub...
+                    echo %DH_PASS% | docker login -u %DH_USER% --password-stdin
+                    docker tag %FULL_NAME_IMAGE% %DH_USER%/%IMAGE_NAME%:%IMAGE_TAG%
+                    docker push %DH_USER%/%IMAGE_NAME%:%IMAGE_TAG%
+                    """
+                }
+            }
+        }
     }
 
-    stage('Run container & smoke test') {
-      steps {
-        script {
-          // Use gmail creds for container env if your app needs them to not crash on startup
-          withCredentials([usernamePassword(credentialsId: 'gmail-creds', usernameVariable: 'GMAIL_USER', passwordVariable: 'GMAIL_PASS')]) {
-            sh '''
-              # Run container in background with Gmail ENV injected (so app won't crash if it requires env)
-              cid=$(docker run -d -p 5000:5000 -e GMAIL_USER="$GMAIL_USER" -e GMAIL_PASSWORD="$GMAIL_PASS" ${IMAGE_NAME}:${IMAGE_TAG})
-              echo "Container id: $cid"
-              # Wait for app to be up (poll up to ~30s)
-              attempts=0
-              until curl --silent --fail http://localhost:5000/health || [ $attempts -ge 15 ]; do
-                sleep 2
-                attempts=$((attempts+1))
-                echo "Waiting for app to start... $attempts"
-              done
-              # Show container logs for debug
-              docker logs $cid || true
-              # Stop and remove container
-              docker rm -f $cid || true
-            '''
-          }
+    post {
+        always {
+            bat "docker image prune -f"
         }
-      }
-    }
-
-    stage('Push to Docker Hub (optional)') {
-      when {
-        expression {
-          // Check presence of dockerhub credentials - always try, fails gracefully if not set
-          return true
+        success {
+            echo "Pipeline finished successfully — image: ${IMAGE_NAME}:${IMAGE_TAG}"
         }
-      }
-      steps {
-        script {
-          // Use DockerHub creds to login, tag and push
-          withCredentials([usernamePassword(credentialsId: 'dockerhub-creds', usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
-            sh '''
-              echo "Logging into Docker Hub as $DH_USER"
-              echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
-              docker tag ${IMAGE_NAME}:${IMAGE_TAG} ${DH_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-              docker push ${DH_USER}/${IMAGE_NAME}:${IMAGE_TAG}
-            '''
-          }
+        failure {
+            echo "Pipeline FAILED — check logs"
         }
-      }
     }
-  }
-
-  post {
-    always {
-      sh "docker image prune -f || true"
-    }
-    success {
-      echo "Pipeline finished successfully (image: ${IMAGE_NAME}:${IMAGE_TAG})"
-    }
-    failure {
-      echo "Pipeline failed - check console output"
-    }
-  }
 }
